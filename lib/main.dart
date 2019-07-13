@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'objects/Quotation.dart';
+import 'objects/HomePopupMenu.dart';
 
 void main() async {
   runApp(MaterialApp(
@@ -8,7 +9,7 @@ void main() async {
         hintColor: Colors.amber,
         primaryColor: Colors.white,
       )));
-  }
+}
 
 class Home extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   var quotation = Quotation();
+  var homePopup = HomePopupMenu.start();
 
   final realController = TextEditingController();
   final dolarController = TextEditingController();
@@ -24,7 +26,7 @@ class _HomeState extends State<Home> {
   final btcController = TextEditingController();
 
   void _realChanged(String valueText) {
-    if(valueText.isEmpty) {
+    if (valueText.isEmpty) {
       _clearAll();
       return;
     }
@@ -36,7 +38,7 @@ class _HomeState extends State<Home> {
   }
 
   void _dolarChanged(String valueText) {
-    if(valueText.isEmpty) {
+    if (valueText.isEmpty) {
       _clearAll();
       return;
     }
@@ -49,7 +51,7 @@ class _HomeState extends State<Home> {
   }
 
   void _euroChanged(String valueText) {
-    if(valueText.isEmpty) {
+    if (valueText.isEmpty) {
       _clearAll();
       return;
     }
@@ -62,7 +64,7 @@ class _HomeState extends State<Home> {
   }
 
   void _btcChanged(String valueText) {
-    if(valueText.isEmpty) {
+    if (valueText.isEmpty) {
       _clearAll();
       return;
     }
@@ -70,25 +72,44 @@ class _HomeState extends State<Home> {
     var amount = double.parse(valueText);
     var real = quotation.bitcoinToReal(amount);
     realController.text = real.toStringAsFixed(2);
-    dolarController.text = (real * quotation.usd).toStringAsFixed(2);
-    euroController.text = (real * quotation.eu).toStringAsFixed(10);
+    dolarController.text = (real / quotation.usd).toStringAsFixed(2);
+    euroController.text = (real / quotation.eu).toStringAsFixed(2);
   }
 
-  void _clearAll(){
+  void _clearAll() {
     realController.text = "";
     dolarController.text = "";
     euroController.text = "";
     btcController.text = "";
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-          title: Text("\$ Conversor de moeda \$"),
+          title: Text("\$ Conversor de moedas \$"),
           centerTitle: true,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: _clearAll,
+              tooltip: "Limpar campos",
+            ),
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                choiceAction(value, context, quotation.quotation);
+              },
+              itemBuilder: (BuildContext context) {
+                return homePopup.menuList.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            )
+          ],
           backgroundColor: Colors.amber),
       body: FutureBuilder(
           future: quotation.getData(),
@@ -115,24 +136,27 @@ class _HomeState extends State<Home> {
                         Icon(Icons.monetization_on,
                             size: 150.0, color: Colors.amber),
                         Divider(),
-                        buildTextField("Reias", "R\$", realController, _realChanged),
+                        buildTextField(
+                            "Reias", "R\$", realController, _realChanged),
                         Divider(),
-                        buildTextField("Dolares", "US\$", dolarController, _dolarChanged),
+                        buildTextField(
+                            "Dolares", "US\$", dolarController, _dolarChanged),
                         Divider(),
-                        buildTextField("Euros", "€", euroController, _euroChanged),
+                        buildTextField(
+                            "Euros", "€", euroController, _euroChanged),
                         Divider(),
-                        buildTextField("Bitcoins", "BTC\$", btcController, _btcChanged)
+                        buildTextField(
+                            "Bitcoins", "BTC\$", btcController, _btcChanged)
                       ],
                     ),
                   );
                 }
             }
-          }),
-    );
-  }
-}
+          }));
+}}
 
-Widget buildTextField(String label, String prefix, TextEditingController controller, Function function) {
+Widget buildTextField(String label, String prefix,
+    TextEditingController controller, Function function) {
   return TextField(
     style: TextStyle(color: Colors.amber, fontSize: 25.0),
     controller: controller,
@@ -141,10 +165,21 @@ Widget buildTextField(String label, String prefix, TextEditingController control
     decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.amber),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white)),
-        enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.amber)),
-        prefixText: prefix),
+        focusedBorder:
+        OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+        enabledBorder:
+        OutlineInputBorder(borderSide: BorderSide(color: Colors.amber)),
+        prefixText: prefix + " "),
   );
+}
+
+void choiceAction(String action, BuildContext context, String content) {
+  print(action);
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: Text("Cotações do dia:"),
+            content: Text(content));
+      });
 }

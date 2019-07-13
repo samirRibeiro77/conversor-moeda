@@ -30,9 +30,11 @@ class Quotation {
     return quotationJson;
   }
 
-  get usd => _usd.value;
-  get eu => _euro.value;
-  get btc => _btc.value;
+  double get usd => _usd.value;
+  double get eu => _euro.value;
+  double get btc => _btc.value;
+
+  get quotation => "Dólar: ${usd.toStringAsFixed(2)}\nEuro: ${eu.toStringAsFixed(2)}\nBitcoin: ${btc.toStringAsFixed(2)}";
 
   double euToReal(value) {
     return value * eu;
