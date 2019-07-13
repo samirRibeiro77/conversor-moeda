@@ -18,6 +18,70 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   var quotation = Quotation();
 
+  final realController = TextEditingController();
+  final dolarController = TextEditingController();
+  final euroController = TextEditingController();
+  final btcController = TextEditingController();
+
+  void _realChanged(String valueText) {
+    if(valueText.isEmpty) {
+      _clearAll();
+      return;
+    }
+
+    var amount = double.parse(valueText);
+    dolarController.text = (amount / quotation.usd).toStringAsFixed(2);
+    euroController.text = (amount / quotation.eu).toStringAsFixed(2);
+    btcController.text = (amount / quotation.btc).toStringAsFixed(10);
+  }
+
+  void _dolarChanged(String valueText) {
+    if(valueText.isEmpty) {
+      _clearAll();
+      return;
+    }
+
+    var amount = double.parse(valueText);
+    var real = quotation.dolarToReal(amount);
+    realController.text = real.toStringAsFixed(2);
+    euroController.text = (real / quotation.eu).toStringAsFixed(2);
+    btcController.text = (real / quotation.btc).toStringAsFixed(10);
+  }
+
+  void _euroChanged(String valueText) {
+    if(valueText.isEmpty) {
+      _clearAll();
+      return;
+    }
+
+    var amount = double.parse(valueText);
+    var real = quotation.euToReal(amount);
+    realController.text = real.toStringAsFixed(2);
+    dolarController.text = (real / quotation.usd).toStringAsFixed(2);
+    btcController.text = (real / quotation.btc).toStringAsFixed(10);
+  }
+
+  void _btcChanged(String valueText) {
+    if(valueText.isEmpty) {
+      _clearAll();
+      return;
+    }
+
+    var amount = double.parse(valueText);
+    var real = quotation.bitcoinToReal(amount);
+    realController.text = real.toStringAsFixed(2);
+    dolarController.text = (real * quotation.usd).toStringAsFixed(2);
+    euroController.text = (real * quotation.eu).toStringAsFixed(10);
+  }
+
+  void _clearAll(){
+    realController.text = "";
+    dolarController.text = "";
+    euroController.text = "";
+    btcController.text = "";
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,13 +114,14 @@ class _HomeState extends State<Home> {
                       children: <Widget>[
                         Icon(Icons.monetization_on,
                             size: 150.0, color: Colors.amber),
-                        buildTextField("Reias", "R\$"),
                         Divider(),
-                        buildTextField("Dolares", "US\$"),
+                        buildTextField("Reias", "R\$", realController, _realChanged),
                         Divider(),
-                        buildTextField("Euros", "€"),
+                        buildTextField("Dolares", "US\$", dolarController, _dolarChanged),
                         Divider(),
-                        buildTextField("Bitcoins", "BTC\$")
+                        buildTextField("Euros", "€", euroController, _euroChanged),
+                        Divider(),
+                        buildTextField("Bitcoins", "BTC\$", btcController, _btcChanged)
                       ],
                     ),
                   );
@@ -67,11 +132,12 @@ class _HomeState extends State<Home> {
   }
 }
 
-Widget buildTextField(String label, String prefix
-    /*, TextEditingController controller*/) {
+Widget buildTextField(String label, String prefix, TextEditingController controller, Function function) {
   return TextField(
     style: TextStyle(color: Colors.amber, fontSize: 25.0),
-    /*controller: controller,*/
+    controller: controller,
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
+    onChanged: function,
     decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.amber),

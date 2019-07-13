@@ -30,7 +30,19 @@ class Quotation {
     return quotationJson;
   }
 
-  get usd => _usd;
-  get eu => _euro;
-  get btc => _btc;
+  get usd => _usd.value;
+  get eu => _euro.value;
+  get btc => _btc.value;
+
+  double euToReal(value) {
+    return value * eu;
+  }
+
+  double dolarToReal(value) {
+    return value * usd;
+  }
+
+  double bitcoinToReal(value) {
+    return value * btc;
+  }
 }

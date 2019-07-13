@@ -6,4 +6,6 @@ class Coin {
   double buyValue(amount)  => amount * _buy;
 
   double sellValue(amount) => amount * _sell;
+
+  get value => _buy;
 }
