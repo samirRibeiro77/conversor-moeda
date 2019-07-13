@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'objects/Quotation.dart';
+import 'package:http/http.dart' as http;
 
-void main() => runApp(Home());
+void main() async=> runApp(Home());
 
 class Home extends StatefulWidget {
   @override
@@ -8,8 +10,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text("\$ Conversor de moeda \$"),
+        centerTitle: true,
+        backgroundColor: Colors.amber
+      ),
+    );
   }
 }
